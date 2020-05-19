@@ -19,6 +19,16 @@ TEST(InsertTest, SingleInsert) {
     GTEST_ASSERT_EQ(result, -1);
 }
 
-TEST(LeafSplitTest, Split) {
+TEST(InsertTest, DuplicateInsert) {
+    PmEHash* ehash = new PmEHash;
+    kv temp;
+    temp.key = temp.value = 1;
+    int result = ehash->insert(temp);
+    GTEST_ASSERT_EQ(result, 0);
+    result = ehash->insert(temp);
+    GTEST_ASSERT_EQ(result, -1);
+}
 
+TEST(UpdateTest, SingleUpdate) {
+    
 }

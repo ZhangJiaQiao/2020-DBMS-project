@@ -12,6 +12,8 @@ This is the final project of 2020 DBMS course in SYSU
 ## 涉及知识点
 + 可扩展哈希
 + 简单的NVM编程
++ gtest单元测试
++ 编写makefile编译
 + github团队编程
 + 定长页表设计和使用
 + 简单的页表文件空间管理
@@ -19,11 +21,27 @@ This is the final project of 2020 DBMS course in SYSU
 ## 项目讲解
 项目是一个可扩展哈希，存储定长键值对形式的数据，提供给外界的接口只有对键值对的增删改查操作，底层存储与模拟NVM硬件进行交互，将数据持久存储在文件中，重启时能够重新恢复可扩展哈希的存储状态。
 
-## 项目步骤
+## 文件夹说明：
++ data: 存放可扩展哈希的相关数据页表，目录以及元数据，即存放PmEHash对象数据文件的文件夹。**编写代码时记得将代码中的数据目录设置为这个目录**
++ gtest: Google Test源文件，不需要动
++ include: 项目相关头文件
++ PMDK-dependency: PMDK相关依赖
++ src: 项目相关源文件
++ task: 课程设计任务文档说明
++ test: 项目需要通过的测试源文件
++ workload: YCSB benchmark测试的数据集
+
+## 项目总体步骤
 1. 安装PMDK
 2. 用内存模拟NVM
-3. 实现代码框架的功能并进行简单的Google test
-4. 进行YCSB benchmark测试
+3. 实现代码框架的功能并进行简单的Google test，运行并通过ehash_test.cpp中的简单测试
+4. 编写main函数进行YCSB benchmark测试，读取workload中的数据文件进行增删改查操作，测试运行时间并截图性能结果。
+
+## 需要编写的文件说明
+1. src下所有源文件以及makefile
+2. src下自编写ycsb读取workload进行性能测试
+3. 如增添源文件，修改test下的makefile进行编译
+4. include中所有头文件进行自定义增添和补充
 
 ## 架构示意图
 
@@ -78,6 +96,16 @@ int search(key, & return_val):
 ```
 
 ### 初始化和恢复
+新建或重新载入旧的哈希都是通过PmEHash的默认构造函数进行。目标数据文件夹下无可扩展哈希的数据文件，则新建一个可扩展哈希以及相关管理文件，即元数据文件和目录。假设存在旧的可扩展哈希，则通过pmem的内存映射打开，恢复原可扩展哈希的状态。
+
+```
+PmEHash():
+数据文件夹下无旧哈希的数据：
+    新建目录和元数据文件并映射
+数据文件夹下有旧哈希：
+    recover()
+
+```
 
 
 ## 关键数据文件
@@ -99,3 +127,9 @@ int search(key, & return_val):
 
 ### 文件空间地址pm_address
 这个数据结构用于定位指定数据页上的指定位移的数据。如fileId为1，offset为100表示数据位于文件号为1的数据页上的第100字节处。
+
+### 可扩展哈希如何获得桶的存储空间以及管理数据页的空闲空间
+可扩展哈希通过getNewBucket获得空闲的桶空间，这些空间由free_list队列统一记录，没有空闲空间就申请新的数据页，返回可用空闲空间地址并出队列。当生成新的数据页时，将所有产生的空闲空间地址记录到free_list中。当桶空时，将对应的空闲空间记录回free_list。重新载入可扩展哈希时，要将所有的数据页空闲槽位地址加入free_list。
+
+### 如何记录虚拟地址以及对应的文件地址pm_address的对应关系
+通过PmEHash中的vAddr2pmAddr映射数据结构进行记录，每个虚拟地址都应记录其对应的文件地址。
