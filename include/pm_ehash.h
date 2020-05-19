@@ -1,12 +1,18 @@
 #ifndef PM_E_HASH_H
 #define PM_E_HASH_H
-#include<stdint.h>
+#include<cstdint>
+#include<queue>
+#include<map>
+#include"data_page.h"
 
 #define BUCKET_SLOT_NUM 15
 #define DEFAULT_CATALOG_SIZE 16
 
+using namespace std;
+
 const char* META_NAME = "pm_ehash_metadata";
 const char* CATALOG_NAME = "pm_ehash_catalog";
+const char* PM_EHASH_DIRECTORY = "";        // add your own directory path to store the pm_ehash
 
 
 /* 
@@ -32,15 +38,15 @@ typedef struct kv
 typedef struct pm_bucket
 {
     uint64_t local_depth;
-    uint8_t  bitmap[BUCKET_SLOT_NUM / 8 + 1];   // one bit for each slot
-    kv       slot[BUCKET_SLOT_NUM];
+    uint8_t  bitmap[BUCKET_SLOT_NUM / 8 + 1];      // one bit for each slot
+    kv       slot[BUCKET_SLOT_NUM];                                // one slot for one kv-pair
 } pm_bucket;
 
 typedef struct ehash_catalog
 {
     pm_address* buckets_pm_address;         // pm address array of buckets
     pm_bucket*  buckets_virtual_address;    // virtual address array mapped by pmem_map
-} ehash_metadata;
+} ehash_catalog;
 
 typedef struct ehash_metadata
 {
@@ -53,22 +59,29 @@ class PmEHash
 {
 private:
     
-    ehash_metadata* metadata;
-    ehash_catalog   catalog;
+    ehash_metadata* metadata;       // virtual address of metadata, mapping the metadata file
+    ehash_catalog   catalog;        // the catalog of hash
+
+    queue<pm_bucket*> free_slot;        //all free slots in data pages to store buckets
+    map<pm_bucket*, pm_address> vAddr2pmAddr;       // virtual address map to pm_address, used to find specific pm_address
 
     uint64_t hashFunc(uint64_t key);
+
+    pm_bucket* getFreeBucket(uint64_t key);
+    kv* getFreeKvSlot(pm_bucket* bucket);
 
     void splitBucket(uint64_t bucket_id);
     void mergeBucket(uint64_t bucket_id);
 
     void extendCatalog();
     void* getNewSlot(pm_address& new_address);
+    void allocNewPage();
+
     void recover();
     void mapAllPage();
 
 public:
-    PmEHash() = delete;
-    PmEHash(const char* file_dir_path);
+    PmEHash();
     ~PmEHash();
 
     int insert(kv new_kv_pair);
