@@ -35,7 +35,7 @@ int PmEHash::remove(uint64_t key) {
     return -1;
 }
 /**
- * @description: 
+ * @description: 更新现存的键值对的值
  * @param kv: 更新的键值对，有原键和新值
  * @return: 0 = update successfully, -1 = fail to update(target data doesn't exist)
  */
@@ -62,22 +62,37 @@ uint64_t PmEHash::hashFunc(uint64_t key) {
 }
 
 /**
- * @description: 
- * @param {type} 
- * @return: 
+ * @description: 获得供插入的空闲的桶，无空闲桶则先分裂桶然后再返回空闲的桶
+ * @param uint64_t: 带插入的键
+ * @return: 空闲桶的虚拟地址
  */
 pm_bucket* PmEHash::getFreeBucket(uint64_t key) {
 
 }
 
+/**
+ * @description: 获得空闲桶内第一个空闲的位置供键值对插入
+ * @param pm_bucket* bucket
+ * @return: 空闲键值对位置的虚拟地址
+ */
 kv* PmEHash::getFreeKvSlot(pm_bucket* bucket) {
 
 }
 
+/**
+ * @description: 桶满后进行分裂操作，可能触发目录的倍增
+ * @param uint64_t: 目标桶在目录中的序号
+ * @return: NULL
+ */
 void PmEHash::splitBucket(uint64_t bucket_id) {
 
 }
 
+/**
+ * @description: 
+ * @param {type} 
+ * @return: 
+ */
 void PmEHash::mergeBucket(uint64_t bucket_id) {
     
 }
