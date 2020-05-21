@@ -92,6 +92,7 @@ public:
     int update(kv kv_pair);
     int search(uint64_t key, uint64_t& return_val);
 
+    void selfDestory();
 };
 
 #endif

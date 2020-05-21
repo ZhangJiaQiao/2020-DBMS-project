@@ -141,3 +141,12 @@ void PmEHash::recover() {
 void PmEHash::mapAllPage() {
 
 }
+
+/**
+ * @description: 删除PmEHash对象所有数据页，目录和元数据文件，主要供gtest使用。即清空所有可扩展哈希的文件数据，不止是内存上的
+ * @param NULL
+ * @return: NULL
+ */
+void PmEHash::selfDestory() {
+
+}
