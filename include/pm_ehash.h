@@ -1,19 +1,19 @@
-#ifndef PM_E_HASH_H
-#define PM_E_HASH_H
+#ifndef _PM_E_HASH_H
+#define _PM_E_HASH_H
+
 #include<cstdint>
 #include<queue>
 #include<map>
 #include"data_page.h"
 
-#define BUCKET_SLOT_NUM 15
-#define DEFAULT_CATALOG_SIZE 16
+#define BUCKET_SLOT_NUM               15
+#define DEFAULT_CATALOG_SIZE      16
+#define META_NAME                                "pm_ehash_metadata";
+#define CATALOG_NAME                        "pm_ehash_catalog";
+#define PM_EHASH_DIRECTORY        "";        // add your own directory path to store the pm_ehash
 
-using namespace std;
-
-const char* META_NAME = "pm_ehash_metadata";
-const char* CATALOG_NAME = "pm_ehash_catalog";
-const char* PM_EHASH_DIRECTORY = "";        // add your own directory path to store the pm_ehash
-
+using std::queue;
+using std::map;
 
 /* 
 ---the physical address of data in NVM---
@@ -27,7 +27,7 @@ typedef struct pm_address
 } pm_address;
 
 /*
-the data entry stored by the hash
+the data entry stored by the  ehash
 */
 typedef struct kv
 {
@@ -50,21 +50,22 @@ typedef struct ehash_catalog
 
 typedef struct ehash_metadata
 {
-    uint64_t max_file_id;   // next file id that can be allocated
-    uint64_t catalog_size;  // the catalog size of catalog file(amount of data entry)
-    uint64_t global_depth;  // global depth of PmEHash
+    uint64_t max_file_id;      // next file id that can be allocated
+    uint64_t catalog_size;     // the catalog size of catalog file(amount of data entry)
+    uint64_t global_depth;   // global depth of PmEHash
 } ehash_metadata;
 
 class PmEHash
 {
 private:
     
-    ehash_metadata* metadata;       // virtual address of metadata, mapping the metadata file
-    ehash_catalog   catalog;        // the catalog of hash
+    ehash_metadata*                               metadata;                    // virtual address of metadata, mapping the metadata file
+    ehash_catalog                                      catalog;                        // the catalog of hash
 
-    queue<pm_bucket*> free_list;        //all free slots in data pages to store buckets
-    map<pm_bucket*, pm_address> vAddr2pmAddr;       // virtual address map to pm_address, used to find specific pm_address
-
+    queue<pm_bucket*>                         free_list;                      //all free slots in data pages to store buckets
+    map<pm_bucket*, pm_address> vAddr2pmAddr;       // map virtual address to pm_address, used to find specific pm_address
+    map<pm_address, pm_bucket*> pmAddr2vAddr;       // map pm_address to virtual address, used to find specific virtual address
+    
     uint64_t hashFunc(uint64_t key);
 
     pm_bucket* getFreeBucket(uint64_t key);
@@ -76,7 +77,7 @@ private:
     void mergeBucket(uint64_t bucket_id);
 
     void extendCatalog();
-    void* getNewSlot(pm_address& new_address);
+    void* getFreeSlot(pm_address& new_address);
     void allocNewPage();
 
     void recover();

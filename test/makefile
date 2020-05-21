@@ -32,7 +32,7 @@ CPPFLAGS += -isystem $(GTEST_DIR)/include
 CFLAGS = -fPIC -std=c99 -O3 -msse4.2 -mpclmul -march=native -funroll-loops -Wstrict-overflow -Wstrict-aliasing -Wall -Wextra -pedantic -Wshadow
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread -std=c++11
+CXXFLAGS += -g -pthread -std=c++11
 
 # Google Test libraries
 GTEST_LIBS = libgtest.a libgtest_main.a
@@ -91,12 +91,10 @@ libgtest.a : gtest-all.o
 libgtest_main.a : gtest-all.o gtest_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
-
-
 pm_ehash.o: $(USER_DIR)/pm_ehash.cpp ../include/pm_ehash.h ../include/data_page.h
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I ../include -c $(USER_DIR)/pm_ehash.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/pm_ehash.cpp -I $(USER_HEADER_DIR)
 
-$(EHASH_TEST) : pm_ehash.o $(GTEST_LIBS) | $(DATA) $(BIN) 
+$(EHASH_TEST) : pm_ehash.o ehash_test.o  $(GTEST_LIBS) | $(DATA) $(BIN) 
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -L$(GTEST_LIB_DIR) -lgtest_main -lpthread $^ -lpmem -o $@
 
 ehash_test.o : ehash_test.cpp  $(USER_HEADER_DIR)/pm_ehash.h  $(GTEST_HEADERS)
