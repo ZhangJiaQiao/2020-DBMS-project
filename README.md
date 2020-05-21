@@ -44,7 +44,7 @@ This is the final project of 2020 DBMS course in SYSU
 4. include中所有头文件进行自定义增添和补充
 
 ## 架构示意图
-
+![架构图](./asset/PmEHash.bmp)
 
 ## 代码说明
 ### 插入操作
