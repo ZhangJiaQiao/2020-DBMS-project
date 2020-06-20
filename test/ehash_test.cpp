@@ -55,6 +55,7 @@ TEST(SearchTest, SingleSearch) {
     result = ehash->search(1, val);
     GTEST_ASSERT_EQ(result, 0);
     GTEST_ASSERT_EQ(val, 1);
+    ehash->selfDestory();
 }
 
 TEST(RemoveTest, SingleRemove) {
@@ -73,6 +74,6 @@ TEST(RemoveTest, SingleRemove) {
     uint64_t val = 0;
     result = ehash->search(1, val);
     GTEST_ASSERT_EQ(result, -1);
-    GTEST_ASSERT_EQ(val, 1);
+    GTEST_ASSERT_EQ(val, 0);
     ehash->selfDestory();
 }
