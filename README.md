@@ -43,6 +43,19 @@ This is the final project of 2020 DBMS course in SYSU
 3. 如增添源文件，修改test下的makefile进行编译
 4. include中所有头文件进行自定义增添和补充
 
+## 提交内容
+组长将以下内容打包上传至学者网
+1. 实验报告
+1. 实现的源代码
+1. 源代码运行README，要求能够一键make运行
+
+## 实验报告要求
+1. 组号，组员姓名学号以及贡献
+1. 代码仓库地址
+1. 代码基本项实现说明
+1. 加分项实现说明
+1. 实验效果截图，gtest以及ycsb测试
+
 ## 架构示意图
 ![架构图](./asset/PmEHash.bmp)
 
